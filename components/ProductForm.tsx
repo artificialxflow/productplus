@@ -1,0 +1,278 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+interface Category {
+  id: number
+  name: string
+  description?: string
+}
+
+interface ProductFormProps {
+  product?: {
+    id: number
+    name: string
+    price: number
+    description?: string
+    image?: string
+    stock: number
+    categoryId?: number
+  }
+  mode: 'create' | 'edit'
+}
+
+export default function ProductForm({ product, mode }: ProductFormProps) {
+  const [formData, setFormData] = useState({
+    name: product?.name || '',
+    price: product?.price || 0,
+    description: product?.description || '',
+    image: product?.image || '',
+    stock: product?.stock || 0,
+    categoryId: product?.categoryId || ''
+  })
+  
+  const [categories, setCategories] = useState<Category[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  
+  const router = useRouter()
+
+  // دریافت دسته‌بندی‌ها
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data)
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'price' || name === 'stock' ? parseFloat(value) || 0 : value
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const url = mode === 'create' ? '/api/products' : `/api/products/${product?.id}`
+      const method = mode === 'create' ? 'POST' : 'PUT'
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          categoryId: formData.categoryId ? parseInt(formData.categoryId as string) : null
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setSuccess(data.message)
+        
+        if (mode === 'create') {
+          // پاک کردن فرم بعد از ایجاد موفق
+          setFormData({
+            name: '',
+            price: 0,
+            description: '',
+            image: '',
+            stock: 0,
+            categoryId: ''
+          })
+        }
+        
+        // هدایت به صفحه محصولات بعد از 2 ثانیه
+        setTimeout(() => {
+          router.push('/')
+        }, 2000)
+      } else {
+        const errorData = await response.json()
+        setError(errorData.error || 'خطا در ذخیره محصول')
+      }
+    } catch (error) {
+      setError('خطا در ارتباط با سرور')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="container mt-4">
+      <div className="row justify-content-center">
+        <div className="col-md-8">
+          <div className="card shadow">
+            <div className="card-header bg-primary text-white">
+              <h4 className="mb-0">
+                {mode === 'create' ? 'افزودن محصول جدید' : 'ویرایش محصول'}
+              </h4>
+            </div>
+            <div className="card-body p-4">
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  {error}
+                </div>
+              )}
+              
+              {success && (
+                <div className="alert alert-success" role="alert">
+                  {success}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit}>
+                <div className="row">
+                  <div className="col-md-6">
+                    <div className="mb-3">
+                      <label htmlFor="name" className="form-label">نام محصول *</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="col-md-6">
+                    <div className="mb-3">
+                      <label htmlFor="categoryId" className="form-label">دسته‌بندی</label>
+                      <select
+                        className="form-select"
+                        id="categoryId"
+                        name="categoryId"
+                        value={formData.categoryId}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                      >
+                        <option value="">انتخاب دسته‌بندی</option>
+                        {categories.map(category => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="col-md-6">
+                    <div className="mb-3">
+                      <label htmlFor="price" className="form-label">قیمت (تومان) *</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        id="price"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        min="0"
+                        step="1000"
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="col-md-6">
+                    <div className="mb-3">
+                      <label htmlFor="stock" className="form-label">موجودی *</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        id="stock"
+                        name="stock"
+                        value={formData.stock}
+                        onChange={handleChange}
+                        min="0"
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="image" className="form-label">آدرس تصویر</label>
+                  <input
+                    type="url"
+                    className="form-control"
+                    id="image"
+                    name="image"
+                    value={formData.image}
+                    onChange={handleChange}
+                    placeholder="https://example.com/image.jpg"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="description" className="form-label">توضیحات</label>
+                  <textarea
+                    className="form-control"
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows={4}
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div className="d-flex gap-2">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        در حال ذخیره...
+                      </>
+                    ) : (
+                      mode === 'create' ? 'افزودن محصول' : 'ویرایش محصول'
+                    )}
+                  </button>
+                  
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => router.push('/')}
+                    disabled={isLoading}
+                  >
+                    انصراف
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
