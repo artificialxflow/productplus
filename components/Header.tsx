@@ -47,11 +47,18 @@ export default function Header() {
                       </Link>
                     </li>
                     {user.role === 'ADMIN' && (
-                      <li>
-                        <Link className="dropdown-item" href="/admin">
-                          <i className="bi bi-shield-check me-2"></i>پنل مدیریت
-                        </Link>
-                      </li>
+                      <>
+                        <li>
+                          <Link className="dropdown-item" href="/admin/users">
+                            <i className="bi bi-people me-2"></i>مدیریت کاربران
+                          </Link>
+                        </li>
+                        <li>
+                          <Link className="dropdown-item" href="/admin/orders">
+                            <i className="bi bi-cart me-2"></i>مدیریت سفارشات
+                          </Link>
+                        </li>
+                      </>
                     )}
                     <li><hr className="dropdown-divider" /></li>
                     <li>
@@ -106,11 +113,18 @@ export default function Header() {
                   </Link>
                 </li>
                 {user.role === 'ADMIN' && (
-                  <li className="nav-item">
-                    <Link className="nav-link" href="/admin" onClick={() => setIsMenuOpen(false)}>
-                      <i className="bi bi-shield-check me-2"></i>پنل مدیریت
-                    </Link>
-                  </li>
+                  <>
+                    <li className="nav-item">
+                      <Link className="nav-link" href="/admin/users" onClick={() => setIsMenuOpen(false)}>
+                        <i className="bi bi-people me-2"></i>مدیریت کاربران
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link className="nav-link" href="/admin/orders" onClick={() => setIsMenuOpen(false)}>
+                        <i className="bi bi-cart me-2"></i>مدیریت سفارشات
+                      </Link>
+                    </li>
+                  </>
                 )}
               </>
             )}
