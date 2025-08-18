@@ -46,6 +46,11 @@ export default function Header() {
                         <i className="bi bi-person me-2"></i>پروفایل
                       </Link>
                     </li>
+                    <li>
+                      <Link className="dropdown-item" href="/settings">
+                        <i className="bi bi-gear me-2"></i>تنظیمات
+                      </Link>
+                    </li>
                     {user.role === 'ADMIN' && (
                       <>
                         <li>
