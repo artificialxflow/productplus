@@ -2,9 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isLoading, logout } = useAuth();
+
+  const handleSignOut = async () => {
+    await logout();
+  };
 
   return (
     <>
@@ -20,19 +26,51 @@ export default function Header() {
                 <i className="bi bi-list fs-4"></i>
               </button>
             </div>
-            <div className="col-8 text-center">
-              <h1 className="h5 text-white mb-0 fw-bold">PRICE LIST</h1>
+            <div className="col-6 text-center">
+              <h1 className="h5 text-white mb-0 fw-bold">PRODUCTPLUS</h1>
             </div>
-            <div className="col-2 text-end">
-              <div className="dropdown">
-                <button className="btn btn-link text-white p-0" data-bs-toggle="dropdown">
-                  <i className="bi bi-three-dots-vertical fs-5"></i>
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end">
-                  <li><a className="dropdown-item" href="#"><i className="bi bi-printer me-2"></i>چاپ</a></li>
-                  <li><Link className="dropdown-item" href="/settings"><i className="bi bi-gear me-2"></i>تنظیمات</Link></li>
-                </ul>
-              </div>
+            <div className="col-4 text-end">
+              {isLoading ? (
+                <div className="spinner-border spinner-border-sm text-white" role="status">
+                  <span className="visually-hidden">در حال بارگذاری...</span>
+                </div>
+              ) : user ? (
+                <div className="dropdown">
+                  <button className="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                    <i className="bi bi-person-circle fs-5 me-1"></i>
+                    <span className="d-none d-sm-inline">{user.name}</span>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <Link className="dropdown-item" href="/profile">
+                        <i className="bi bi-person me-2"></i>پروفایل
+                      </Link>
+                    </li>
+                    {user.role === 'ADMIN' && (
+                      <li>
+                        <Link className="dropdown-item" href="/admin">
+                          <i className="bi bi-shield-check me-2"></i>پنل مدیریت
+                        </Link>
+                      </li>
+                    )}
+                    <li><hr className="dropdown-divider" /></li>
+                    <li>
+                      <button className="dropdown-item text-danger" onClick={handleSignOut}>
+                        <i className="bi bi-box-arrow-right me-2"></i>خروج
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                <div className="d-flex gap-2">
+                  <Link href="/login" className="btn btn-outline-light btn-sm">
+                    ورود
+                  </Link>
+                  <Link href="/register" className="btn btn-light btn-sm">
+                    ثبت‌نام
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -55,21 +93,46 @@ export default function Header() {
                 <i className="bi bi-house me-2"></i>صفحه اصلی
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" href="/add-product" onClick={() => setIsMenuOpen(false)}>
-                <i className="bi bi-plus-circle me-2"></i>افزودن کالا
-              </Link>
-            </li>
+            {user && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/add-product" onClick={() => setIsMenuOpen(false)}>
+                    <i className="bi bi-plus-circle me-2"></i>افزودن کالا
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/profile" onClick={() => setIsMenuOpen(false)}>
+                    <i className="bi bi-person me-2"></i>پروفایل
+                  </Link>
+                </li>
+                {user.role === 'ADMIN' && (
+                  <li className="nav-item">
+                    <Link className="nav-link" href="/admin" onClick={() => setIsMenuOpen(false)}>
+                      <i className="bi bi-shield-check me-2"></i>پنل مدیریت
+                    </Link>
+                  </li>
+                )}
+              </>
+            )}
             <li className="nav-item">
               <Link className="nav-link" href="/settings" onClick={() => setIsMenuOpen(false)}>
                 <i className="bi bi-gear me-2"></i>تنظیمات
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" href="/profile" onClick={() => setIsMenuOpen(false)}>
-                <i className="bi bi-person me-2"></i>پروفایل
-              </Link>
-            </li>
+            {!user && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/login" onClick={() => setIsMenuOpen(false)}>
+                    <i className="bi bi-box-arrow-in-right me-2"></i>ورود
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/register" onClick={() => setIsMenuOpen(false)}>
+                    <i className="bi bi-person-plus me-2"></i>ثبت‌نام
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>
