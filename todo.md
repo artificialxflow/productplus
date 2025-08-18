@@ -37,9 +37,9 @@
 - [x] `/api/auth/login` - ورود کاربر ✅
 - [x] `/api/auth/logout` - خروج کاربر ✅
 - [x] `/api/auth/verify` - تایید JWT token ✅
-- [ ] `/api/products/*` - CRUD محصولات
+- [x] `/api/products/*` - CRUD محصولات ✅
+- [x] `/api/categories/*` - مدیریت دسته‌بندی‌ها ✅
 - [ ] `/api/users/*` - مدیریت کاربران
-- [ ] `/api/categories/*` - مدیریت دسته‌بندی‌ها
 - [ ] `/api/orders/*` - مدیریت سفارشات
 - [ ] `/api/upload/*` - آپلود تصاویر
 - [ ] `/api/import/*` - وارد کردن Excel/Word
