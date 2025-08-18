@@ -1,0 +1,138 @@
+'use client'
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+
+interface User {
+  id: number
+  name: string
+  email: string
+  role: string
+}
+
+interface AuthContextType {
+  user: User | null
+  isLoading: boolean
+  login: (email: string, password: string) => Promise<boolean>
+  register: (name: string, email: string, password: string) => Promise<boolean>
+  logout: () => Promise<void>
+  checkAuth: () => Promise<void>
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
+}
+
+interface AuthProviderProps {
+  children: ReactNode
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // بررسی وضعیت احراز هویت در ابتدای بارگذاری
+  useEffect(() => {
+    checkAuth()
+  }, [])
+
+  // بررسی وضعیت احراز هویت
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth/verify')
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data.user)
+      } else {
+        setUser(null)
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error)
+      setUser(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // ورود به سیستم
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data.user)
+        return true
+      } else {
+        const errorData = await response.json()
+        console.error('Login failed:', errorData.error)
+        return false
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      return false
+    }
+  }
+
+  // ثبت‌نام
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      })
+
+      if (response.ok) {
+        return true
+      } else {
+        const errorData = await response.json()
+        console.error('Registration failed:', errorData.error)
+        return false
+      }
+    } catch (error) {
+      console.error('Registration error:', error)
+      return false
+    }
+  }
+
+  // خروج از سیستم
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      })
+      setUser(null)
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
+
+  const value: AuthContextType = {
+    user,
+    isLoading,
+    login,
+    register,
+    logout,
+    checkAuth,
+  }
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
