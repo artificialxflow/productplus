@@ -46,6 +46,9 @@ export async function GET(request: NextRequest) {
               id: true,
               name: true
             }
+          },
+          images: {
+            orderBy: { order: 'asc' }
           }
         },
         orderBy: { createdAt: 'desc' },
