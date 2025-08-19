@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient()
 
@@ -45,7 +45,14 @@ export async function GET(request: NextRequest) {
                   id: true,
                   name: true,
                   price: true,
-                  image: true
+                  images: {
+                    select: {
+                      id: true,
+                      url: true,
+                      alt: true,
+                      isPrimary: true
+                    }
+                  }
                 }
               }
             }
@@ -191,7 +198,14 @@ export async function POST(request: NextRequest) {
                 id: true,
                 name: true,
                 price: true,
-                image: true
+                images: {
+                  select: {
+                    id: true,
+                    url: true,
+                    alt: true,
+                    isPrimary: true
+                  }
+                }
               }
             }
           }
