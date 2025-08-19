@@ -11,7 +11,12 @@ interface OrderItem {
     id: number
     name: string
     price: number
-    image?: string
+    images?: Array<{
+      id: number
+      url: string
+      alt: string
+      isPrimary: boolean
+    }>
   }
 }
 
