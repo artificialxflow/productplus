@@ -23,22 +23,6 @@ export default function AdminCategoriesPage() {
     description: ''
   })
 
-  // بررسی دسترسی مدیر
-  if (user?.role !== 'ADMIN') {
-    return (
-      <div className="container mt-5">
-        <div className="alert alert-danger text-center">
-          <i className="bi bi-exclamation-triangle me-2"></i>
-          شما دسترسی به این صفحه را ندارید
-        </div>
-      </div>
-    )
-  }
-
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
   const fetchCategories = async () => {
     try {
       setLoading(true)
@@ -54,6 +38,22 @@ export default function AdminCategoriesPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  // بررسی دسترسی مدیر
+  if (user?.role !== 'ADMIN') {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-danger text-center">
+          <i className="bi bi-exclamation-triangle me-2"></i>
+          شما دسترسی به این صفحه را ندارید
+        </div>
+      </div>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
