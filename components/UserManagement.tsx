@@ -164,6 +164,37 @@ export default function UserManagement() {
     }
   }
 
+  const handleRoleChange = async (userId: number, newRole: string) => {
+    const roleText = newRole === 'ADMIN' ? 'مدیر' : 'کاربر عادی'
+    if (!confirm(`آیا از تبدیل این کاربر به ${roleText} اطمینان دارید؟`)) {
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/users/change-role', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, newRole })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setSuccess(data.message)
+        fetchUsers(pagination.currentPage)
+      } else {
+        const errorData = await response.json()
+        setError(errorData.error || 'خطا در تغییر نقش کاربر')
+      }
+    } catch (error) {
+      setError('خطا در ارتباط با سرور')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -364,14 +395,24 @@ export default function UserManagement() {
                               className="btn btn-outline-primary"
                               onClick={() => handleEdit(user)}
                               disabled={isLoading}
+                              title="ویرایش"
                             >
                               <i className="bi bi-pencil"></i>
+                            </button>
+                            <button
+                              className={`btn ${user.role === 'ADMIN' ? 'btn-outline-warning' : 'btn-outline-success'}`}
+                              onClick={() => handleRoleChange(user.id, user.role === 'ADMIN' ? 'USER' : 'ADMIN')}
+                              disabled={isLoading}
+                              title={user.role === 'ADMIN' ? 'تبدیل به کاربر عادی' : 'تبدیل به مدیر'}
+                            >
+                              <i className={`bi ${user.role === 'ADMIN' ? 'bi-person-down' : 'bi-person-up'}`}></i>
                             </button>
                             {user.role !== 'ADMIN' && (
                               <button
                                 className="btn btn-outline-danger"
                                 onClick={() => handleDelete(user.id)}
                                 disabled={isLoading}
+                                title="حذف"
                               >
                                 <i className="bi bi-trash"></i>
                               </button>
