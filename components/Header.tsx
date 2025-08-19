@@ -63,6 +63,16 @@ export default function Header() {
                             <i className="bi bi-cart me-2"></i>مدیریت سفارشات
                           </Link>
                         </li>
+                        <li>
+                          <Link className="dropdown-item" href="/admin/discounts">
+                            <i className="bi bi-percent me-2"></i>مدیریت تخفیف‌ها
+                          </Link>
+                        </li>
+                        <li>
+                          <Link className="dropdown-item" href="/admin/bulk-import">
+                            <i className="bi bi-upload me-2"></i>آپلود فایل
+                          </Link>
+                        </li>
                       </>
                     )}
                     <li><hr className="dropdown-divider" /></li>
@@ -127,6 +137,21 @@ export default function Header() {
                     <li className="nav-item">
                       <Link className="nav-link" href="/admin/orders" onClick={() => setIsMenuOpen(false)}>
                         <i className="bi bi-cart me-2"></i>مدیریت سفارشات
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link className="nav-link" href="/admin/discounts" onClick={() => setIsMenuOpen(false)}>
+                        <i className="bi bi-percent me-2"></i>مدیریت تخفیف‌ها
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link className="nav-link" href="/admin/bulk-import" onClick={() => setIsMenuOpen(false)}>
+                        <i className="bi bi-upload me-2"></i>آپلود فایل
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link className="nav-link" href="/admin/categories" onClick={() => setIsMenuOpen(false)}>
+                        <i className="bi bi-tags me-2"></i>مدیریت دسته‌ها
                       </Link>
                     </li>
                   </>
