@@ -5,23 +5,23 @@ import { useAuth } from '../contexts/AuthContext';
 import ProductCard from './ProductCard';
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
-  serialNumber: string;
-  quantity: number;
-  salePrice: number;
-  discount: number;
+  price: number;
+  stock: number;
+  description?: string;
   images?: Array<{
     id: number;
     url: string;
     alt: string;
     isPrimary: boolean;
   }>;
-  description?: string;
   category?: {
     id: number;
     name: string;
   };
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface Category {
@@ -37,8 +37,8 @@ export default function ProductList() {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [sortBy, setSortBy] = useState<'name' | 'price' | 'serial'>('name');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
+  const [sortBy, setSortBy] = useState<'name' | 'price' | 'description'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
@@ -75,18 +75,18 @@ export default function ProductList() {
     }
   };
 
-  const handleEdit = (id: string) => {
+  const handleEdit = (id: number) => {
     console.log('Edit product:', id);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: number) => {
     console.log('Delete product:', id);
   };
 
   const filteredAndSortedProducts = products
     .filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.serialNumber.toLowerCase().includes(searchTerm.toLowerCase());
+              const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesCategory = !selectedCategory || product.category?.id.toString() === selectedCategory;
       return matchesSearch && matchesCategory;
     })
@@ -99,12 +99,12 @@ export default function ProductList() {
           bValue = b.name;
           break;
         case 'price':
-          aValue = a.salePrice;
-          bValue = b.salePrice;
+          aValue = a.price;
+          bValue = b.price;
           break;
-        case 'serial':
-          aValue = a.serialNumber;
-          bValue = b.serialNumber;
+        case 'description':
+          aValue = a.description || '';
+          bValue = b.description || '';
           break;
         default:
           aValue = a.name;
@@ -118,7 +118,7 @@ export default function ProductList() {
       }
     });
 
-  const handleSort = (field: 'name' | 'price' | 'serial') => {
+  const handleSort = (field: 'name' | 'price' | 'description') => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -127,7 +127,7 @@ export default function ProductList() {
     }
   };
 
-  const getSortIcon = (field: 'name' | 'price' | 'serial') => {
+  const getSortIcon = (field: 'name' | 'price' | 'description') => {
     if (sortBy !== field) return <i className="bi bi-arrow-down-up text-muted"></i>;
     return sortOrder === 'asc' ? 
       <i className="bi bi-arrow-up text-primary"></i> : 
@@ -200,7 +200,7 @@ export default function ProductList() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="جستجو در نام یا شماره سریال..."
+                placeholder="جستجو در نام یا توضیحات..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -223,11 +223,11 @@ export default function ProductList() {
               <select
                 className="form-select"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'serial')}
+                onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'description')}
               >
                 <option value="name">مرتب‌سازی بر اساس نام</option>
                 <option value="price">مرتب‌سازی بر اساس قیمت</option>
-                <option value="serial">مرتب‌سازی بر اساس شماره سریال</option>
+                <option value="description">مرتب‌سازی بر اساس توضیحات</option>
               </select>
             </div>
             <div className="col-md-2">
@@ -269,7 +269,7 @@ export default function ProductList() {
                 <div className="card-body text-center">
                   <h6 className="card-title">موجود</h6>
                   <h4 className="mb-0">
-                    {filteredAndSortedProducts.filter(p => p.quantity > 0).length}
+                    {filteredAndSortedProducts.filter(p => p.stock > 0).length}
                   </h4>
                 </div>
               </div>
@@ -277,9 +277,9 @@ export default function ProductList() {
             <div className="col-md-3">
               <div className="card bg-warning text-white">
                 <div className="card-body text-center">
-                  <h6 className="card-title">تخفیف دار</h6>
+                  <h6 className="card-title">محصولات فعال</h6>
                   <h4 className="mb-0">
-                    {filteredAndSortedProducts.filter(p => p.discount > 0).length}
+                    {filteredAndSortedProducts.filter(p => p.stock > 0).length}
                   </h4>
                 </div>
               </div>
@@ -312,9 +312,9 @@ export default function ProductList() {
                         </th>
                         <th 
                           style={{ cursor: 'pointer' }}
-                          onClick={() => handleSort('serial')}
+                          onClick={() => handleSort('description')}
                         >
-                          شماره سریال {getSortIcon('serial')}
+                          توضیحات {getSortIcon('description')}
                         </th>
                         <th>دسته‌بندی</th>
                         <th 
@@ -331,7 +331,7 @@ export default function ProductList() {
                     <tbody>
                       {filteredAndSortedProducts.map((product, index) => {
                         const userDiscount = user?.discountPercentage || 0;
-                        const finalPrice = product.salePrice * (1 - userDiscount / 100);
+                        const finalPrice = product.price * (1 - userDiscount / 100);
                         const hasUserDiscount = userDiscount > 0;
                         
                         return (
@@ -358,9 +358,9 @@ export default function ProductList() {
                                </div>
                              </td>
                             <td>
-                              <code className="bg-light px-2 py-1 rounded">
-                                {product.serialNumber}
-                              </code>
+                              <small className="text-muted">
+                                {product.description || 'بدون توضیحات'}
+                              </small>
                             </td>
                             <td>
                               {product.category ? (
@@ -375,9 +375,9 @@ export default function ProductList() {
                               <div>
                                 {hasUserDiscount ? (
                                   <>
-                                    <div className="text-muted text-decoration-line-through">
-                                      {new Intl.NumberFormat('fa-IR').format(product.salePrice)} تومان
-                                    </div>
+                                                                      <div className="text-muted text-decoration-line-through">
+                                    {new Intl.NumberFormat('fa-IR').format(product.price)} تومان
+                                  </div>
                                     <div className="text-success fw-bold">
                                       {new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان
                                     </div>
@@ -387,28 +387,20 @@ export default function ProductList() {
                                   </>
                                 ) : (
                                   <div className="fw-bold">
-                                    {new Intl.NumberFormat('fa-IR').format(product.salePrice)} تومان
-                                  </div>
-                                )}
-                                {product.discount > 0 && (
-                                  <div className="text-warning small">
-                                    تخفیف محصول: {product.discount}%
+                                    {new Intl.NumberFormat('fa-IR').format(product.price)} تومان
                                   </div>
                                 )}
                               </div>
                             </td>
                             <td>
-                              <span className={`badge ${product.quantity > 0 ? 'bg-success' : 'bg-danger'}`}>
-                                {product.quantity > 0 ? `${product.quantity} عدد` : 'ناموجود'}
+                              <span className={`badge ${product.stock > 0 ? 'bg-success' : 'bg-danger'}`}>
+                                {product.stock > 0 ? `${product.stock} عدد` : 'ناموجود'}
                               </span>
                             </td>
                             <td>
                               <div className="d-flex flex-column gap-1">
-                                {product.quantity > 0 && (
+                                {product.stock > 0 && (
                                   <span className="badge bg-success">موجود</span>
-                                )}
-                                {product.discount > 0 && (
-                                  <span className="badge bg-warning">تخفیف</span>
                                 )}
                                 {hasUserDiscount && (
                                   <span className="badge bg-info">تخفیف کاربر</span>
