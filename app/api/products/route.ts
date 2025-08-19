@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient()
 
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, price, description, image, stock, categoryId } = await request.json()
+    const { name, price, description, stock, categoryId } = await request.json()
 
     // اعتبارسنجی ورودی‌ها
     if (!name || !price || stock === undefined) {
@@ -129,7 +129,6 @@ export async function POST(request: NextRequest) {
         name,
         price: parseFloat(price),
         description,
-        image,
         stock: parseInt(stock),
         categoryId: categoryId ? parseInt(categoryId) : null
       },
@@ -139,7 +138,8 @@ export async function POST(request: NextRequest) {
             id: true,
             name: true
           }
-        }
+        },
+        images: true
       }
     })
 
