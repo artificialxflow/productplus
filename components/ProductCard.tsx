@@ -9,7 +9,12 @@ interface Product {
   quantity: number;
   salePrice: number;
   discount: number;
-  image?: string;
+  images?: Array<{
+    id: number;
+    url: string;
+    alt: string;
+    isPrimary: boolean;
+  }>;
 }
 
 interface ProductCardProps {
@@ -41,9 +46,9 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
       <div className="card product-card">
         <div className="card-body text-center">
           <div className="product-image mb-2">
-            {product.image ? (
+            {product.images && product.images.length > 0 ? (
               <img 
-                src={product.image} 
+                src={product.images.find(img => img.isPrimary)?.url || product.images[0].url} 
                 alt={product.name} 
                 className="img-fluid rounded" 
                 style={{ width: '60px', height: '60px', objectFit: 'cover' }}
