@@ -132,6 +132,11 @@ export default function Header() {
                     <i className="bi bi-person me-2"></i>پروفایل
                   </Link>
                 </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/my-role" onClick={() => setIsMenuOpen(false)}>
+                    <i className="bi bi-person-badge me-2"></i>نقش و دسترسی‌ها
+                  </Link>
+                </li>
                 {user.role === 'ADMIN' && (
                   <>
                     <li className="nav-item">
