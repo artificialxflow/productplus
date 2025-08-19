@@ -66,7 +66,10 @@ export async function GET(request: NextRequest) {
     )
 
   } catch (error) {
-    console.error("Token verification error:", error)
+    console.error("Token verification error:", error);
+    if (error instanceof jwt.JsonWebTokenError) {
+      console.error("JWT Error details:", error.message);
+    }
     return NextResponse.json(
       { error: "توکن نامعتبر است" },
       { status: 401 }
