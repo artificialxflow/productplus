@@ -41,3 +41,12 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# production
+/logs
+*.log
+
+# cPanel deployment
+.htaccess
+ecosystem.config.js
+deploy.sh
