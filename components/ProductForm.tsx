@@ -89,6 +89,13 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
 
       if (response.ok) {
         const data = await response.json()
+        
+        // اگر محصول جدید ایجاد شد و تصاویر انتخاب شده، آنها را آپلود کن
+        if (mode === 'create' && uploadedFiles.length > 0) {
+          const productId = data.product.id
+          await uploadImages(productId)
+        }
+        
         setSuccess(data.message)
         
         if (mode === 'create') {
@@ -97,10 +104,10 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
             name: '',
             price: 0,
             description: '',
-            image: '',
             stock: 0,
             categoryId: ''
           })
+          setUploadedFiles([])
         }
         
         // هدایت به صفحه محصولات بعد از 2 ثانیه
@@ -115,6 +122,30 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
       setError('خطا در ارتباط با سرور')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  // آپلود تصاویر محصول
+  const uploadImages = async (productId: number) => {
+    try {
+      for (let i = 0; i < uploadedFiles.length; i++) {
+        const file = uploadedFiles[i]
+        const formData = new FormData()
+        formData.append('image', file)
+        formData.append('alt', `تصویر ${i + 1} محصول`)
+        formData.append('isPrimary', i === 0 ? 'true' : 'false') // اولین تصویر اصلی باشد
+
+        const response = await fetch(`/api/products/${productId}/images`, {
+          method: 'POST',
+          body: formData
+        })
+
+        if (!response.ok) {
+          console.error(`خطا در آپلود تصویر ${i + 1}:`, await response.text())
+        }
+      }
+    } catch (error) {
+      console.error('خطا در آپلود تصاویر:', error)
     }
   }
 
