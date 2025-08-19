@@ -42,8 +42,8 @@ export default function SettingsPage() {
     if (user) {
       setSettingsForm(prev => ({
         ...prev,
-        name: user.name || '',
-        email: user.email || ''
+        name: (user as any).name || '',
+        email: (user as any).email || ''
       }))
     }
   }, [user])
@@ -55,7 +55,7 @@ export default function SettingsPage() {
     setError('')
 
     try {
-      const response = await fetch(`/api/users/${user?.id}`, {
+      const response = await fetch(`/api/users/${(user as any)?.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ export default function SettingsPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: user?.email,
+          email: (user as any)?.email,
           password: settingsForm.currentPassword
         })
       })
@@ -117,7 +117,7 @@ export default function SettingsPage() {
       }
 
       // حالا رمز عبور جدید را تنظیم می‌کنیم
-      const updateResponse = await fetch(`/api/users/${user?.id}/password`, {
+      const updateResponse = await fetch(`/api/users/${(user as any)?.id}/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -405,16 +405,16 @@ export default function SettingsPage() {
               <div className="card-body">
                 <div className="row">
                   <div className="col-md-6">
-                    <p><strong>نام:</strong> {user.name}</p>
-                    <p><strong>ایمیل:</strong> {user.email}</p>
+                    <p><strong>نام:</strong> {(user as any).name}</p>
+                    <p><strong>ایمیل:</strong> {(user as any).email}</p>
                   </div>
                   <div className="col-md-6">
                     <p><strong>نقش:</strong> 
-                      <span className={`badge ${user.role === 'ADMIN' ? 'bg-danger' : 'bg-primary'} ms-2`}>
-                        {user.role === 'ADMIN' ? 'مدیر' : 'کاربر'}
+                      <span className={`badge ${(user as any).role === 'ADMIN' ? 'bg-danger' : 'bg-primary'} ms-2`}>
+                        {(user as any).role === 'ADMIN' ? 'مدیر' : 'کاربر'}
                       </span>
                     </p>
-                    <p><strong>تاریخ عضویت:</strong> {new Date(user.createdAt).toLocaleDateString('fa-IR')}</p>
+                    <p><strong>تاریخ عضویت:</strong> {new Date((user as any).createdAt).toLocaleDateString('fa-IR')}</p>
                   </div>
                 </div>
               </div>
