@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "../../../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken"
 
 const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {
-    // دریافت token از cookie
-    const token = request.cookies.get("auth-token")?.value
+    // دریافت token از cookie یا Authorization header
+    let token = request.cookies.get("auth-token")?.value
+    
+    if (!token) {
+      // بررسی Authorization header
+      const authHeader = request.headers.get("authorization")
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.substring(7)
+      }
+    }
 
     if (!token) {
       return NextResponse.json(
