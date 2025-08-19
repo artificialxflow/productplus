@@ -3,24 +3,27 @@
 import { useAuth } from '../contexts/AuthContext';
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
-  serialNumber: string;
-  quantity: number;
-  salePrice: number;
-  discount: number;
+  price: number;
+  stock: number;
+  description?: string;
   images?: Array<{
     id: number;
     url: string;
     alt: string;
     isPrimary: boolean;
   }>;
+  category?: {
+    id: number;
+    name: string;
+  };
 }
 
 interface ProductCardProps {
   product: Product;
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
 }
 
 export default function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
@@ -38,7 +41,7 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
 
   // محاسبه قیمت نهایی با تخفیف کاربر
   const userDiscountPercentage = user?.discountPercentage || 0;
-  const finalPrice = product.salePrice * (1 - userDiscountPercentage / 100);
+  const finalPrice = product.price * (1 - userDiscountPercentage / 100);
   const hasUserDiscount = userDiscountPercentage > 0;
 
   return (
@@ -60,14 +63,14 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
           <h6 className="card-title small mb-1" title={product.name}>
             {product.name.length > 20 ? product.name.substring(0, 20) + '...' : product.name}
           </h6>
-          <p className="card-text text-muted small mb-1">{product.serialNumber}</p>
+          <p className="card-text text-muted small mb-1">{product.description || 'بدون توضیحات'}</p>
           
           {/* نمایش قیمت با تخفیف */}
           <div className="mb-2">
             {hasUserDiscount ? (
               <>
                 <p className="text-muted small mb-1">
-                  <del>{new Intl.NumberFormat('fa-IR').format(product.salePrice)} تومان</del>
+                  <del>{new Intl.NumberFormat('fa-IR').format(product.price)} تومان</del>
                 </p>
                 <p className="text-success fw-bold mb-1">
                   {new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان
@@ -78,17 +81,12 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
               </>
             ) : (
               <p className="text-success fw-bold mb-1">
-                {new Intl.NumberFormat('fa-IR').format(product.salePrice)} تومان
+                {new Intl.NumberFormat('fa-IR').format(product.price)} تومان
               </p>
             )}
           </div>
 
-          {/* تخفیف محصول */}
-          {product.discount > 0 && (
-            <span className="badge bg-warning mb-2">تخفیف محصول: {product.discount}%</span>
-          )}
-          
-          <p className="text-muted small mb-2">موجودی: {product.quantity}</p>
+          <p className="text-muted small mb-2">موجودی: {product.stock}</p>
           
           {/* نمایش سطح تخفیف کاربر */}
           {user && (
