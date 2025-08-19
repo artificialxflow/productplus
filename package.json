@@ -18,7 +18,7 @@
     "bcryptjs": "^3.0.2",
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
-    "express": "^4.18.2",
+    "express": "^4.21.2",
     "jose": "^6.0.12",
     "jsonwebtoken": "^9.0.2",
     "mammoth": "^1.10.0",
