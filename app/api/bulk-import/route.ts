@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import * as XLSX from 'xlsx'
 import mammoth from 'mammoth'
 
