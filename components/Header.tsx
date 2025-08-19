@@ -47,6 +47,11 @@ export default function Header() {
                       </Link>
                     </li>
                     <li>
+                      <Link className="dropdown-item" href="/my-role">
+                        <i className="bi bi-person-badge me-2"></i>نقش و دسترسی‌ها
+                      </Link>
+                    </li>
+                    <li>
                       <Link className="dropdown-item" href="/settings">
                         <i className="bi bi-gear me-2"></i>تنظیمات
                       </Link>
