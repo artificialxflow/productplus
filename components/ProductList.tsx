@@ -11,7 +11,12 @@ interface Product {
   quantity: number;
   salePrice: number;
   discount: number;
-  image?: string;
+  images?: Array<{
+    id: number;
+    url: string;
+    alt: string;
+    isPrimary: boolean;
+  }>;
   description?: string;
   category?: {
     id: number;
@@ -332,26 +337,26 @@ export default function ProductList() {
                         return (
                           <tr key={product.id}>
                             <td className="text-muted">{index + 1}</td>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                {product.image ? (
-                                  <img 
-                                    src={product.image} 
-                                    alt={product.name}
-                                    className="rounded me-2"
-                                    style={{ width: '32px', height: '32px', objectFit: 'cover' }}
-                                  />
-                                ) : (
-                                  <i className="bi bi-box text-muted me-2"></i>
-                                )}
-                                <div>
-                                  <div className="fw-bold">{product.name}</div>
-                                  {product.description && (
-                                    <small className="text-muted">{product.description}</small>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
+                                                         <td>
+                               <div className="d-flex align-items-center">
+                                 {product.images && product.images.length > 0 ? (
+                                   <img 
+                                     src={product.images.find(img => img.isPrimary)?.url || product.images[0].url} 
+                                     alt={product.name}
+                                     className="rounded me-2"
+                                     style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                                   />
+                                 ) : (
+                                   <i className="bi bi-box text-muted me-2"></i>
+                                 )}
+                                 <div>
+                                   <div className="fw-bold">{product.name}</div>
+                                   {product.description && (
+                                     <small className="text-muted">{product.description}</small>
+                                   )}
+                                 </div>
+                               </div>
+                             </td>
                             <td>
                               <code className="bg-light px-2 py-1 rounded">
                                 {product.serialNumber}
