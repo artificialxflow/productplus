@@ -50,15 +50,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // بررسی وضعیت احراز هویت
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/verify')
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data.user)
+      // ابتدا از Local Storage بررسی کن
+      const token = localStorage.getItem('auth-token')
+      
+      if (token) {
+        // ارسال توکن به سرور برای تایید
+        const response = await fetch('/api/auth/verify', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          setUser(data.user)
+        } else {
+          // توکن نامعتبر است، حذف از Local Storage
+          localStorage.removeItem('auth-token')
+          setUser(null)
+        }
       } else {
+        // توکنی وجود ندارد
         setUser(null)
       }
     } catch (error) {
       console.error('Auth check failed:', error)
+      localStorage.removeItem('auth-token')
       setUser(null)
     } finally {
       setIsLoading(false)
@@ -79,6 +96,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.ok) {
         const data = await response.json()
         setUser(data.user)
+        
+        // ذخیره توکن در Local Storage
+        if (data.token) {
+          localStorage.setItem('auth-token', data.token)
+        }
+        
         return true
       } else {
         const errorData = await response.json()
@@ -129,6 +152,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.ok) {
         const data = await response.json()
         setUser(data.user)
+        
+        // ذخیره توکن در Local Storage
+        if (data.token) {
+          localStorage.setItem('auth-token', data.token)
+        }
+        
         return true
       } else {
         const errorData = await response.json()
@@ -171,9 +200,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await fetch('/api/auth/logout', {
         method: 'POST',
       })
+      // حذف توکن از Local Storage
+      localStorage.removeItem('auth-token')
       setUser(null)
     } catch (error) {
       console.error('Logout error:', error)
+      // حتی در صورت خطا، توکن را حذف کن
+      localStorage.removeItem('auth-token')
+      setUser(null)
     }
   }
 
