@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "../../generated/prisma"
+import { PrismaClient } from "../../generated/prisma";
 
 const prisma = new PrismaClient()
 
@@ -7,10 +7,23 @@ const prisma = new PrismaClient()
 export async function GET() {
   try {
     const categories = await prisma.category.findMany({
-      orderBy: { name: 'asc' }
+      orderBy: { name: 'asc' },
+      include: {
+        _count: {
+          select: { products: true }
+        }
+      }
     })
 
-    return NextResponse.json(categories)
+    // تبدیل به فرمت مورد نیاز
+    const categoriesWithCount = categories.map(category => ({
+      id: category.id,
+      name: category.name,
+      description: category.description,
+      productCount: category._count.products
+    }))
+
+    return NextResponse.json(categoriesWithCount)
 
   } catch (error) {
     console.error('Error fetching categories:', error)
