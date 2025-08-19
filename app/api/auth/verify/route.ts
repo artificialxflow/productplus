@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
+import { PrismaClient } from "../../../generated/prisma";
 import jwt from "jsonwebtoken"
+
+const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,13 +22,36 @@ export async function GET(request: NextRequest) {
       process.env.JWT_SECRET || "your-secret-key"
     ) as any
 
+    // دریافت اطلاعات کامل کاربر از دیتابیس
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      include: {
+        level: {
+          select: {
+            id: true,
+            name: true,
+            discountPercentage: true
+          }
+        }
+      }
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "کاربر یافت نشد" },
+        { status: 404 }
+      )
+    }
+
+    // حذف اطلاعات حساس
+    const { password: _, otpCode: __, otpExpires: ___, ...userWithoutSensitive } = user
+
     return NextResponse.json(
       { 
         message: "توکن معتبر است",
         user: {
-          userId: decoded.userId,
-          email: decoded.email,
-          role: decoded.role
+          ...userWithoutSensitive,
+          discountPercentage: user.level?.discountPercentage || user.discountPercentage || 0
         }
       },
       { status: 200 }
