@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import ImageUploader from './ImageUploader'
 
 interface Category {
   id: number
@@ -15,7 +16,6 @@ interface ProductFormProps {
     name: string
     price: number
     description?: string
-    image?: string
     stock: number
     categoryId?: number
   }
@@ -27,10 +27,12 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
     name: product?.name || '',
     price: product?.price || 0,
     description: product?.description || '',
-    image: product?.image || '',
     stock: product?.stock || 0,
     categoryId: product?.categoryId || ''
   })
+  
+  const [productImages, setProductImages] = useState<any[]>([])
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -216,18 +218,70 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="image" className="form-label">آدرس تصویر</label>
-                  <input
-                    type="url"
-                    className="form-control"
-                    id="image"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    placeholder="https://example.com/image.jpg"
-                    disabled={isLoading}
-                  />
+                {/* مدیریت تصاویر محصول */}
+                <div className="mb-4">
+                  <h6 className="mb-3">
+                    <i className="bi bi-images me-2"></i>
+                    {mode === 'create' ? 'آپلود تصاویر محصول' : 'مدیریت تصاویر محصول'}
+                  </h6>
+                  {mode === 'create' ? (
+                    <div>
+                      <div className="mb-3">
+                        <label className="form-label">آپلود تصاویر محصول</label>
+                        <input
+                          type="file"
+                          className="form-control"
+                          multiple
+                          accept="image/*"
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || [])
+                            setUploadedFiles(files)
+                          }}
+                          disabled={isLoading}
+                        />
+                        <small className="text-muted">
+                          می‌توانید چندین تصویر انتخاب کنید. فرمت‌های پشتیبانی شده: JPG, PNG, GIF
+                        </small>
+                      </div>
+                      {uploadedFiles.length > 0 && (
+                        <div className="mb-3">
+                          <h6>تصاویر انتخاب شده:</h6>
+                          <div className="row g-2">
+                            {uploadedFiles.map((file, index) => (
+                              <div key={index} className="col-md-3">
+                                <div className="card">
+                                  <img
+                                    src={URL.createObjectURL(file)}
+                                    alt={`تصویر ${index + 1}`}
+                                    className="card-img-top"
+                                    style={{ height: '100px', objectFit: 'cover' }}
+                                  />
+                                  <div className="card-body p-2">
+                                    <small className="text-muted">{file.name}</small>
+                                    <button
+                                      type="button"
+                                      className="btn btn-sm btn-outline-danger d-block w-100 mt-1"
+                                      onClick={() => {
+                                        setUploadedFiles(prev => prev.filter((_, i) => i !== index))
+                                      }}
+                                    >
+                                      <i className="bi bi-trash"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <ImageUploader
+                      productId={product!.id}
+                      onImagesChange={setProductImages}
+                      existingImages={productImages}
+                    />
+                  )}
                 </div>
 
                 <div className="mb-3">
