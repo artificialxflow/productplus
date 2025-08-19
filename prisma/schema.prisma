@@ -14,16 +14,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// مدل سطوح تخفیف کاربران
+model UserLevel {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(100)
+  discountPercentage Int @default(0)
+  description String?  @db.Text
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("user_levels")
+}
+
+// مدل تصویر محصول
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String   @db.VarChar(500)
+  alt       String?  @db.VarChar(255)
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("product_images")
+}
+
 // مدل محصول
 model Product {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
   price       Decimal  @db.Decimal(10, 2)
   description String?  @db.Text
-  image       String?  @db.VarChar(500)
   stock       Int      @default(0)
   categoryId  Int?
   category    Category? @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   orderItems  OrderItem[]
@@ -49,7 +76,14 @@ model User {
   email     String   @unique @db.VarChar(255)
   name      String   @db.VarChar(100)
   password  String   @db.VarChar(255)
+  phone     String?  @unique @db.VarChar(15)
+  isPhoneVerified Boolean @default(false)
+  otpCode   String?  @db.VarChar(6)
+  otpExpires DateTime?
   role      UserRole @default(USER)
+  levelId   Int?
+  level     UserLevel? @relation(fields: [levelId], references: [id])
+  discountPercentage Int @default(0)
   orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
