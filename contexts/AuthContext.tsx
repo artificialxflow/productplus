@@ -6,13 +6,19 @@ interface User {
   id: number
   name: string
   email: string
+  phone?: string
   role: string
+  isPhoneVerified?: boolean
+  levelId?: number
+  discountPercentage?: number
 }
 
 interface AuthContextType {
   user: User | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<boolean>
+  loginWithPhone: (phone: string) => Promise<boolean>
+  verifyOTP: (phone: string, otpCode: string) => Promise<boolean>
   register: (name: string, email: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   checkAuth: () => Promise<void>
@@ -59,7 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  // ورود به سیستم
+  // ورود به سیستم با ایمیل
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await fetch('/api/auth/login', {
@@ -81,6 +87,56 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error('Login error:', error)
+      return false
+    }
+  }
+
+  // ورود به سیستم با شماره موبایل
+  const loginWithPhone = async (phone: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone }),
+      })
+
+      if (response.ok) {
+        return true
+      } else {
+        const errorData = await response.json()
+        console.error('Send OTP failed:', errorData.error)
+        return false
+      }
+    } catch (error) {
+      console.error('Send OTP error:', error)
+      return false
+    }
+  }
+
+  // تایید کد OTP
+  const verifyOTP = async (phone: string, otpCode: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone, otpCode }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data.user)
+        return true
+      } else {
+        const errorData = await response.json()
+        console.error('OTP verification failed:', errorData.error)
+        return false
+      }
+    } catch (error) {
+      console.error('OTP verification error:', error)
       return false
     }
   }
@@ -125,6 +181,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isLoading,
     login,
+    loginWithPhone,
+    verifyOTP,
     register,
     logout,
     checkAuth,
