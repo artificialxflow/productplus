@@ -2,13 +2,17 @@ const express = require('express');
 const next = require('next');
 const path = require('path');
 const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
 
 const dev = process.env.NODE_ENV !== 'production';
-const hostname = process.env.HOSTNAME || 'localhost';
-const port = process.env.PORT || 3000;
+const hostname = process.env.HOSTNAME || '0.0.0.0';
+const port = process.env.PORT || 4303;
+
+// Force development mode for now
+const forceDev = true;
 
 // Next.js app
-const app = next({ dev, hostname, port });
+const app = next({ dev: forceDev, hostname, port });
 const handle = app.getRequestHandler();
 
 // Prisma client
