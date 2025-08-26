@@ -314,9 +314,9 @@ export default function OrderManagement() {
                         <tr key={item.id}>
                           <td>
                             <div className="d-flex align-items-center">
-                              {item.product.image && (
+                              {item.product.images && item.product.images.length > 0 && (
                                 <img 
-                                  src={item.product.image} 
+                                  src={item.product.images.find(img => img.isPrimary)?.url || item.product.images[0].url} 
                                   alt={item.product.name}
                                   className="me-2"
                                   style={{ width: '40px', height: '40px', objectFit: 'cover' }}
