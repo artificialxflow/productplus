@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
 
+/* Custom CSS Variables */
 :root {
   --primary-color: #1e3a8a;
   --secondary-color: #3b82f6;
