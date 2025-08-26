@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn, getSession } from "next-auth/react"
+import { useAuth } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -11,6 +11,7 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+  const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,21 +19,13 @@ export default function SignIn() {
     setError("")
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      })
+      const success = await login(email, password)
 
-      if (result?.error) {
-        setError("ایمیل یا رمز عبور اشتباه است")
+      if (success) {
+        // Redirect based on user role (will be handled by AuthContext)
+        router.push("/")
       } else {
-        const session = await getSession()
-        if (session?.user?.role === "ADMIN") {
-          router.push("/admin")
-        } else {
-          router.push("/")
-        }
+        setError("ایمیل یا رمز عبور اشتباه است")
       }
     } catch (error) {
       setError("خطا در ورود به سیستم")
