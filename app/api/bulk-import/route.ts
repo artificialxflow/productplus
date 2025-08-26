@@ -53,7 +53,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let products: ProductData[] = []
+    // تعریف type برای محصولات
+    type ProductInput = {
+      name: string
+      serialNumber: string
+      price: number
+      stock: number
+      description: string
+      categoryId: number | null
+    }
+
+    let products: ProductInput[] = []
 
     // پردازش فایل Excel
     if (file.type.includes('excel') || file.type.includes('spreadsheet')) {
@@ -89,9 +99,8 @@ export async function POST(request: NextRequest) {
           return {
             name: row[nameIndex]?.toString() || '',
             serialNumber: row[serialIndex]?.toString() || '',
-            salePrice: parseFloat(row[priceIndex]) || 0,
-            quantity: parseInt(row[quantityIndex]) || 0,
-            discount: row[discountIndex] ? parseFloat(row[discountIndex]) : 0,
+            price: parseFloat(row[priceIndex]) || 0, // تغییر از salePrice به price
+            stock: parseInt(row[quantityIndex]) || 0, // تغییر از quantity به stock
             description: row[descriptionIndex]?.toString() || '',
             categoryId: categoryId ? parseInt(categoryId) : null
           }
@@ -118,16 +127,15 @@ export async function POST(request: NextRequest) {
             return {
               name: match[1].trim(),
               serialNumber: match[2].trim(),
-              salePrice: parseFloat(match[3]) || 0,
-              quantity: parseInt(match[4]) || 0,
-              discount: 0,
+              price: parseFloat(match[3]) || 0, // تغییر از salePrice به price
+              stock: parseInt(match[4]) || 0,  // تغییر از quantity به stock
               description: '',
               categoryId: categoryId ? parseInt(categoryId) : null
             }
           }
           return null
         })
-        .filter(product => product !== null)
+        .filter((product): product is ProductInput => product !== null)
     }
 
     if (products.length === 0) {
@@ -146,10 +154,10 @@ export async function POST(request: NextRequest) {
       if (!product.serialNumber) {
         validationErrors.push(`سطر ${index + 1}: شماره سریال الزامی است`)
       }
-      if (product.salePrice <= 0) {
-        validationErrors.push(`سطر ${index + 1}: قیمت فروش باید بیشتر از صفر باشد`)
+      if (product.price <= 0) {
+        validationErrors.push(`سطر ${index + 1}: قیمت باید بیشتر از صفر باشد`)
       }
-      if (product.quantity < 0) {
+      if (product.stock < 0) {
         validationErrors.push(`سطر ${index + 1}: موجودی نمی‌تواند منفی باشد`)
       }
     })
@@ -168,14 +176,16 @@ export async function POST(request: NextRequest) {
     const existingSerialNumbers = await prisma.product.findMany({
       where: {
         serialNumber: {
-          in: products.map(p => p.serialNumber)
+          in: products.map(p => p.serialNumber).filter(Boolean) // فیلتر کردن مقادیر null
         }
       },
       select: { serialNumber: true }
     })
 
     if (existingSerialNumbers.length > 0) {
-      const duplicates = existingSerialNumbers.map((p: { serialNumber: string }) => p.serialNumber)
+      const duplicates = existingSerialNumbers
+        .map((p: { serialNumber: string | null }) => p.serialNumber)
+        .filter(Boolean) // فیلتر کردن مقادیر null
       return NextResponse.json(
         { 
           error: "شماره سریال‌های زیر قبلاً در سیستم ثبت شده‌اند",
