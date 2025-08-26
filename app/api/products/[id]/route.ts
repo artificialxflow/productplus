@@ -63,7 +63,7 @@ export async function PUT(
       )
     }
 
-    const { name, price, description, image, stock, categoryId } = await request.json()
+    const { name, price, description, stock, categoryId } = await request.json()
 
     // اعتبارسنجی ورودی‌ها
     if (!name || !price || stock === undefined) {
@@ -119,7 +119,6 @@ export async function PUT(
         name,
         price: parseFloat(price),
         description,
-        image,
         stock: parseInt(stock),
         categoryId: categoryId ? parseInt(categoryId) : null
       },
