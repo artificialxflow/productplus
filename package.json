@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node server.js",
+    "start:dev": "NODE_ENV=development node server.js",
     "start:node": "node server.js",
     "start:prod": "NODE_ENV=production node server.js",
+    "build:start": "npm run build && npm run start:prod",
     "lint": "next lint",
     "seed": "node seed.js",
     "db:reset": "npx prisma migrate reset --force",
@@ -36,11 +38,9 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }
