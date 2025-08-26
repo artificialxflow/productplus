@@ -72,7 +72,7 @@ export default function TestAuthPage() {
                 <label className="form-label">توکن احراز هویت:</label>
                 <textarea
                   className="form-control"
-                  rows="3"
+                  rows={3}
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
                   placeholder="توکن JWT را اینجا وارد کنید..."
