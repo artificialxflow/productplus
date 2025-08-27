@@ -6,10 +6,10 @@ const fs = require('fs');
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || '0.0.0.0';
-const port = process.env.PORT || 4303;
+const port = process.env.PORT || 3000;
 
-// Force development mode for now
-const forceDev = true;
+// Force production mode for Liara
+const forceDev = false;
 
 // Next.js app
 const app = next({ dev: forceDev, hostname, port });
