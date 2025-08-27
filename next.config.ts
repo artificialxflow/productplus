@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Optimize for Vercel deployment
+  // Optimize for Liara deployment
   output: 'standalone',
   experimental: {
     optimizePackageImports: ['bootstrap-icons']
@@ -12,7 +12,10 @@ const nextConfig: NextConfig = {
       config.externals.push('@prisma/client');
     }
     return config;
-  }
+  },
+  // Fix static assets path
+  assetPrefix: '',
+  basePath: ''
 };
 
 export default nextConfig;
