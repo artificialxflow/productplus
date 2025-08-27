@@ -1,0 +1,13 @@
+{
+  "app": "productplus",
+  "port": 3000,
+  "build": {
+    "location": "iran"
+  },
+  "disks": [],
+  "env": {
+    "DATABASE_URL": "mysql://root:mcTY3QExlwuFyzet11cyoXde@annapurna.liara.cloud:32191/laughing_kilby",
+    "NEXTAUTH_SECRET": "ey-name-to-behtarin-saraghaz-ey-name-to-behtarin-saraghaz",
+    "NEXTAUTH_URL": "https://productplus.liara.run"
+  }
+}
