@@ -10,11 +10,21 @@
     "start:node": "node server.js",
     "start:prod": "NODE_ENV=production PORT=3000 node server.js",
     "build:start": "npm run build && npm run start:prod",
+    "build:dev": "NODE_ENV=development npm run build",
+    "build:prod": "NODE_ENV=production npm run build",
+    "build:liara": "prisma generate --schema=./prisma/schema.prisma && next build --no-lint",
+    "start:liara": "NODE_ENV=production PORT=3000 node server.js",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
+    "prisma:push": "prisma db push --schema=./prisma/schema.prisma",
+    "prisma:studio": "prisma studio --schema=./prisma/schema.prisma",
     "lint": "next lint",
     "seed": "tsx prisma/seed.ts",
     "db:reset": "npx prisma migrate reset --force",
     "db:push": "npx prisma db push",
-    "db:generate": "npx prisma generate"
+    "db:generate": "npx prisma generate",
+    "test:db": "node test-connection.js",
+    "test:build": "npm run build",
+    "clean": "rm -rf .next && rm -rf node_modules && npm install"
   },
   "dependencies": {
     "@prisma/client": "^6.14.0",
@@ -31,10 +41,12 @@
     "multer": "^2.0.2",
     "mysql2": "^3.14.3",
     "next": "15.4.6",
+    "notifr": "^1.0.0",
     "prisma": "^6.14.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-dropzone": "^14.3.8",
+    "sweetalert2": "^11.10.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
