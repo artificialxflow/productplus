@@ -12,13 +12,7 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
     }
   },
   // بهبود error handling
-  errorFormat: 'pretty',
-  // تنظیمات connection pool
-  __internal: {
-    engine: {
-      enableEngineDebugMode: process.env.NODE_ENV === 'development'
-    }
-  }
+  errorFormat: 'pretty'
 })
 
 // اصلاح شده: همیشه globalForPrisma را تنظیم کن
@@ -26,15 +20,8 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma
 }
 
-// اضافه کردن error handling
-prisma.$on('error', (e) => {
-  console.error('Prisma Error:', e)
-})
-
-prisma.$on('query', (e) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Prisma Query:', e.query)
-    console.log('Prisma Params:', e.params)
-    console.log('Prisma Duration:', e.duration + 'ms')
-  }
-})
+// اضافه کردن error handling - فقط در development
+if (process.env.NODE_ENV === 'development') {
+  // Log Prisma queries
+  console.log('Prisma Client initialized in development mode')
+}
