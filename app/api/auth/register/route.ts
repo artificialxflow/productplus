@@ -99,26 +99,35 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error("Signup error:", error)
-    console.error("Error details:", {
-      name: error.name,
-      message: error.message,
-      code: error.code,
-      stack: error.stack
-    })
     
-    // بررسی نوع خطا
-    if (error.code === 'P2002') {
-      return NextResponse.json(
-        { error: "این ایمیل یا شماره تلفن قبلاً ثبت شده است" },
-        { status: 400 }
-      )
+    // Type guard برای error
+    if (error instanceof Error) {
+      console.error("Error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      })
+    } else {
+      console.error("Unknown error:", error)
     }
     
-    if (error.code === 'P1001') {
-      return NextResponse.json(
-        { error: "خطا در اتصال به دیتابیس" },
-        { status: 500 }
-      )
+    // بررسی نوع خطا برای Prisma
+    if (error && typeof error === 'object' && 'code' in error) {
+      const prismaError = error as { code: string }
+      
+      if (prismaError.code === 'P2002') {
+        return NextResponse.json(
+          { error: "این ایمیل یا شماره تلفن قبلاً ثبت شده است" },
+          { status: 400 }
+        )
+      }
+      
+      if (prismaError.code === 'P1001') {
+        return NextResponse.json(
+          { error: "خطا در اتصال به دیتابیس" },
+          { status: 500 }
+        )
+      }
     }
     
     return NextResponse.json(
