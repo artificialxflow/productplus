@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "../../../../../lib/prisma";
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
-
-const prisma = new PrismaClient()
 
 // دریافت تصاویر محصول
 export async function GET(
