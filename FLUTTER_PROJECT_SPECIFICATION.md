@@ -472,7 +472,7 @@ DATABASE_URL=mysql://username:password@localhost:3306/productplus
 JWT_SECRET=your-secret-key-here
 
 # API Base URL
-API_BASE_URL=http://localhost:3000/api
+API_BASE_URL=https://swpl.ir/api
 
 # File Upload
 UPLOAD_PATH=./uploads
