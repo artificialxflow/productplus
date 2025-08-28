@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../../lib/prisma";
 import * as XLSX from 'xlsx'
 import mammoth from 'mammoth'
-
-const prisma = new PrismaClient()
 
 interface ProductData {
   name: string;
