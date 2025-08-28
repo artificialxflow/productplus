@@ -8,6 +8,8 @@
     }
   },
   "env": {
-    "PRISMA_GENERATE_DATAPROXY": "true"
+    "PRISMA_GENERATE_DATAPROXY": "true",
+    "NEXTAUTH_URL": "https://swpl.ir",
+    "NEXT_PUBLIC_DOMAIN": "https://swpl.ir"
   }
 }
