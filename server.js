@@ -8,11 +8,26 @@ const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || '0.0.0.0';
 const port = process.env.PORT || 3000;
 
-// Force production mode for Liara
-const forceDev = false;
+// اصلاح شده: اجازه بده Next.js خودش تصمیم بگیرد
+const forceDev = dev;
 
-// Next.js app
-const app = next({ dev: forceDev, hostname, port });
+// Domain configuration
+const domain = process.env.NEXT_PUBLIC_DOMAIN || 'https://swpl.ir';
+
+// Next.js app - اصلاح شده
+const app = next({ 
+  dev: forceDev, 
+  hostname, 
+  port,
+  // Fix for read-only file system
+  dir: process.cwd(),
+  conf: {
+    distDir: '.next',
+    generateBuildId: async () => {
+      return 'build-' + Date.now()
+    }
+  }
+});
 const handle = app.getRequestHandler();
 
 // Prisma client
@@ -34,7 +49,8 @@ app.prepare().then(() => {
     res.json({ 
       status: 'OK', 
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
+      database: process.env.DATABASE_URL ? 'Configured' : 'Not Configured'
     });
   });
 
@@ -64,6 +80,7 @@ app.prepare().then(() => {
     console.log(`> Ready on http://${hostname}:${port}`);
     console.log(`> Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`> Port: ${port}`);
+    console.log(`> Database: ${process.env.DATABASE_URL ? 'Configured' : 'Not Configured'}`);
   });
 
   // Graceful shutdown
