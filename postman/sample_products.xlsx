@@ -1,0 +1,18 @@
+This is a placeholder for an Excel file. You should create an actual Excel file with the following structure:
+
+Sheet: Products
+Columns:
+- name (نام محصول)
+- price (قیمت)
+- description (توضیحات)
+- stock (موجودی)
+- categoryId (شناسه دسته‌بندی)
+- serialNumber (شماره سریال)
+
+Sample Data:
+name,price,description,stock,categoryId,serialNumber
+لپتاپ گیمینگ,2500000,لپتاپ گیمینگ با کارت گرافیک RTX 3060,10,1,LAPTOP-GAMING-001
+موبایل هوشمند,1800000,گوشی هوشمند با دوربین 108MP,15,2,MOBILE-001
+هدفون بی‌سیم,450000,هدفون بلوتوث با کیفیت بالا,25,3,HEADPHONE-001
+تبلت 10 اینچ,1200000,تبلت با صفحه نمایش Full HD,8,1,TABLET-001
+کیبورد مکانیکی,350000,کیبورد گیمینگ با سوئیچ Blue,30,3,KEYBOARD-001
