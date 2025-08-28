@@ -79,7 +79,7 @@ export async function middleware(request: NextRequest) {
     const response = NextResponse.redirect(new URL('/login', request.url))
     response.cookies.set('auth-token', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true, // همیشه true در سرور
       sameSite: 'strict',
       maxAge: 0
     })
