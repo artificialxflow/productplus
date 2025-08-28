@@ -73,6 +73,18 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error("Login error:", error)
+    
+    // Type guard برای error
+    if (error instanceof Error) {
+      console.error("Error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      })
+    } else {
+      console.error("Unknown error:", error)
+    }
+    
     return NextResponse.json(
       { error: "خطا در ورود به سیستم" },
       { status: 500 }
