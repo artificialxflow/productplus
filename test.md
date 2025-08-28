@@ -11,7 +11,7 @@
 ### مرحله 2: تست سیستم احراز هویت
 
 #### 2.1 تست ثبت‌نام کاربر جدید
-**URL**: `http://localhost:3000/register`
+**URL**: `https://swpl.ir/register`
 **داده‌های تست**:
 ```json
 {
@@ -22,7 +22,7 @@
 ```
 
 #### 2.2 تست ورود کاربر
-**URL**: `http://localhost:3000/login`
+**URL**: `https://swpl.ir/login`
 **داده‌های تست**:
 ```json
 {
@@ -46,7 +46,7 @@
 ### مرحله 4: تست مدیریت محصولات
 
 #### 4.1 افزودن محصول جدید
-**URL**: `http://localhost:3000/add-product`
+**URL**: `https://swpl.ir/add-product`
 **داده‌های تست**:
 ```json
 {
